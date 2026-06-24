@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宇宙戦艦ヤマト — 偉大なる航跡</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #001b44;
+  --deep: #141441;
+  --panel: #080c1a;
+  --wave: #00d4ff;
+  --wave-dim: rgba(0,212,255,0.12);
+  --wave-border: rgba(0,212,255,0.35);
+  --remake: #b060ff;
+  --remake-dim: rgba(176,96,255,0.12);
+  --remake-border: rgba(176,96,255,0.35);
+  --gold: #ffd060;
+  --starlight: #c0c0ff;
+  --text: #e0e8ff;
+  --muted: #5a6a88;
+  --divider: rgba(255,255,255,0.07);
+  --active-color: var(--wave);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── Starfield ── */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Page layout ── */
+.page {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.25rem 6rem;
+}
+
+/* ── Hero comment block ── */
+.hero-comment {
+  padding: 3rem 0 0;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  color: var(--wave);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 7vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  background: linear-gradient(135deg, #fff 20%, var(--wave) 65%, var(--starlight));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.hero-sub {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--starlight);
+  opacity: 0.6;
+  margin-bottom: 2rem;
+}
+
+/* personal comment box */
+.personal-comment {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  margin-bottom: 2rem;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.personal-comment::before {
+  content: '個人コメント';
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--wave);
+  opacity: 0.7;
+  display: block;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+/* image placeholder */
+.hero-image-slot {
+  width: 100%;
+  aspect-ratio: 16/7;
+  background: var(--panel);
+  border: 1px dashed rgba(0,212,255,0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.2em;
+  opacity: 0.5;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+/* ── Tab switcher ── */
+.tab-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(0,8,20,0.92);
+  backdrop-filter: blur(12px);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: background 0.25s;
+  border-right: 1px solid var(--divider);
+  position: relative;
+}
+
+.tab-btn:last-child { border-right: none; }
+
+.tab-btn:hover { background: rgba(255,255,255,0.04); }
+
+.tab-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--muted);
+  transition: color 0.25s;
+  letter-spacing: 0.05em;
+}
+
+.tab-range {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.25s;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0; left: 10%; right: 10%;
+  height: 2px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.25s;
+}
+
+/* Active: classic */
+.tab-btn.active-classic .tab-label { color: var(--wave); }
+.tab-btn.active-classic .tab-range { opacity: 1; color: var(--wave); }
+.tab-btn.active-classic .tab-indicator { background: var(--wave); }
+
+/* Active: remake */
+.tab-btn.active-remake .tab-label { color: var(--remake); }
+.tab-btn.active-remake .tab-range { opacity: 1; color: var(--remake); }
+.tab-btn.active-remake .tab-indicator { background: var(--remake); }
+
+/* ── Timeline panels ── */
+.timeline-panel {
+  display: none;
+  padding-top: 2.5rem;
+}
+
+.timeline-panel.active { display: block; }
+
+/* column headers */
+.col-headers {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.col-header {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.col-header.year-col { color: var(--muted); }
+.col-header.broadcast-col { color: var(--wave); }
+.col-header.inuniverse-col { color: var(--starlight); opacity: 0.7; }
+
+/* entries */
+.tl-entry {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--divider);
+  padding: 1.5rem 0;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  align-items: start;
+}
+
+.tl-entry.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* year pillar */
+.tl-year {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-right: 1rem;
+  padding-top: 0.15rem;
+}
+
+.year-number {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+
+.year-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+.panel-classic .year-dot { background: var(--wave); box-shadow: 0 0 6px var(--wave); }
+.panel-remake .year-dot { background: var(--remake); box-shadow: 0 0 6px var(--remake); }
+
+/* broadcast col */
+.tl-broadcast {
+  padding: 0 1rem;
+  border-left: 1px solid var(--divider);
+}
+
+/* in-universe col */
+.tl-universe {
+  padding: 0 0 0 1rem;
+  border-left: 1px solid var(--divider);
+}
+
+.work-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.3rem;
+  line-height: 1.3;
+}
+
+.work-meta {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.work-desc {
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.awesome {
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--gold);
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.universe-year {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+}
+
+.panel-classic .universe-year { color: var(--starlight); }
+.panel-remake .universe-year { color: var(--remake); opacity: 0.8; }
+
+.universe-event {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+/* empty cell */
+.tl-empty {
+  padding: 0 0 0 1rem;
+  border-left: 1px solid var(--divider);
+  color: var(--muted);
+  font-size: 0.7rem;
+  opacity: 0.3;
+}
+
+/* section label */
+.section-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 1.25rem 0 0.75rem;
+  opacity: 0.5;
+}
+
+/* ── footer ── */
+footer {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .col-headers { grid-template-columns: 60px 1fr 1fr; }
+  .tl-entry { grid-template-columns: 60px 1fr 1fr; }
+  .year-number { font-size: 0.9rem; }
+  .tl-broadcast, .tl-universe { padding: 0 0.5rem; }
+  .work-title { font-size: 0.7rem; }
+  .work-desc, .universe-event { font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero-comment">
+    <p class="hero-eyebrow">ETERNAL ODYSSEY CHRONICLE</p>
+    <h1 class="hero-title">宇宙戦艦ヤマト</h1>
+    <p class="hero-sub">GREAT VOYAGE — TIMELINE</p>
+
+    <div class="personal-comment">
+      1974年、この地球に一つのSF作品が生まれた。
+      それは今や、世界中でSF作品を代表する一つの作品となり、語り継がれている。
+      かのスターウォーズの監督「ジョージ・ルーカス」も絶賛したといわれる作品。
+      それが「宇宙戦艦ヤマト」。日本の誇るSF作品の一つである。
+    </div>
+
+    <!-- 画像スロット：src="" に画像URLやdata:URLを入れると表示される -->
+    <div class="hero-image-slot" id="imageSlot">
+      <span id="imageSlotLabel">IMAGE SLOT — ここに画像が入ります</span>
+      <img id="heroImg" src="https://prcdn.freetls.fastly.net/release_image/14654/261/14654-261-13edce30ac9a2ecb438552d961358e99-1447x1076.jpg?width=1950&height=1350&quality=85%2C65&format=jpeg&auto=webp&fit=bounds&bg-color=fff" alt="ヤマトイメージ" onload="this.style.opacity=1; document.getElementById('imageSlotLabel').style.display='none'">
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar" id="tabBar">
+    <button class="tab-btn active-classic" id="btn-classic" onclick="switchTab('classic')">
+      <span class="tab-label">旧作版</span>
+      <span class="tab-range">1974 — 2009</span>
+      <div class="tab-indicator"></div>
+    </button>
+    <button class="tab-btn" id="btn-remake" onclick="switchTab('remake')">
+      <span class="tab-label">リメイク版</span>
+      <span class="tab-range">2012 — 2024</span>
+      <div class="tab-indicator"></div>
+    </button>
+  </div>
+
+  <!-- ===== CLASSIC PANEL ===== -->
+  <div class="timeline-panel panel-classic active" id="panel-classic">
+
+    <div class="col-headers">
+      <div class="col-header year-col">放送年</div>
+      <div class="col-header broadcast-col">作品・放送情報</div>
+      <div class="col-header inuniverse-col">劇中年 / 劇中事象</div>
+    </div>
+
+    <!-- 1974 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1974</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト（第1作）</div>
+        <div class="work-meta">TV / 読売テレビ / 26話</div>
+        <div class="work-desc">
+          1974年10月6日放送開始。当初はテレビ漫画という時代もあり、視聴率低迷で打ち切り。しかし再放送で爆発的人気を獲得し、日本SFアニメの歴史を塗り替えた。
+        </div>
+        <div class="awesome">★ 再放送で社会現象へ。敗者から覇者への大逆転</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2199年</div>
+        <div class="universe-event">
+          ガミラス帝星による遊星爆弾攻撃。地球は放射能に覆われ、人類滅亡まで1年。絶望に瀕した地球にイスカンダルからコスモクリーナーDと波動エンジンの設計図が届く。戦艦大和を改造した宇宙戦艦ヤマトが、今旅立つ。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1977 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1977</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">劇場版 宇宙戦艦ヤマト</div>
+        <div class="work-meta">劇場 / 東映 / 編集版</div>
+        <div class="work-desc">
+          TV版を再編集した劇場版が公開。徹夜の行列、入場制限が続出。興行収入は当時の邦画アニメ記録を更新し「アニメブーム」という言葉を生んだ。
+        </div>
+        <div class="awesome">★ スター・ウォーズより前に日本で宇宙SFブームを起こした</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2199年（同上）</div>
+        <div class="universe-event">
+          無限に広がる大宇宙。静寂な光に満ちた世界。死んでゆく星もあれば、生まれてくる星もある。そうだ、宇宙は生きているのだ。我々の太陽を含む大銀河系もまた、生命に満ち溢れているのだ。しかし、我々の地球は今その最後の終末の時を迎えようとしていた。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1978 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1978</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">さらば宇宙戦艦ヤマト 愛の戦士たち</div>
+        <div class="work-meta">劇場 / 東映 / 新作</div>
+        <div class="work-desc">
+          公開直前まで内容が極秘。衝撃のラストシーンは日本中を震撼させた。興行収入21.8億円。当時の子供たちの心に消えない傷を残した名作。
+        </div>
+        <div class="awesome">★ 宇宙戦艦ヤマト、地球のために最後の戦いへと赴く。</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2202年</div>
+        <div class="universe-event">
+          ガミラス戦役が終わり、復興を始めた地球。新鋭戦艦アンドロメダも進宙し、復興の兆しを見せる地球に、一つの通信が入る。そして新たな危機、白色彗星帝国ガトランティスの存在が知らされる。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1979 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1979</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト2</div>
+        <div class="work-meta">TV / 日本テレビ / 26話</div>
+        <div class="work-desc">
+          「さらば」のTV版として制作。ラストが変更され古代進らが生存する結末に。テレサ（テレザート星）との交信と白色彗星帝国との死闘を描く。
+        </div>
+        <div class="awesome">★ 「さらば」と同じ物語でラストが違う。ファン間で永遠に語られる二択</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2202年</div>
+        <div class="universe-event">
+          「さらば」でヤマトは終わらせてはいけない。そういうファンの願いにより復活、再編された奇跡の続編。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1979b 新たなる旅立ち -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1979</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト 新たなる旅立ち</div>
+        <div class="work-meta">TV スペシャル / 日本テレビ / 単発</div>
+        <div class="work-desc">
+          1979年7月31日放映のTVスペシャル。ヤマト2の後日談として制作。イスカンダルとガミラスの関係、スターシャと古代守の物語、そしてヤマトの新たなる旅立ち。
+        </div>
+        <div class="awesome">★ ヤマトシリーズ初のTVスペシャル。スターシャの運命が初めて描かれた</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2202年（ヤマト2後）</div>
+        <div class="universe-event">
+          ガトランティスの脅威も過ぎ去り平和になった地球。新たな乗組員を迎え入れ、訓練航海中の宇宙戦艦ヤマトにかつての宿敵デスラーから一つの通信が入る。それは正体不明の敵に攻撃されたという、救難信号だった。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1980 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1980</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">ヤマトよ永遠に</div>
+        <div class="work-meta">劇場 / 東映 / 新作</div>
+        <div class="work-desc">
+          暗黒星団帝国デザリアムの侵攻。圧倒的技術力に成すすべもなく電撃的に敗北してしまう衝撃的映像。「愛よその日まで」など劇中楽曲が話題を呼んだ。
+        </div>
+        <div class="awesome">★ 宮川泰の音楽なしにヤマトは語れない。交響詩として完璧</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2203年</div>
+        <div class="universe-event">
+          イスカンダルでの事件から数か月後、地球に侵攻してきた帝国、暗黒星団帝国デザリアム。占領された地球を救うためさらなる進化を遂げたヤマトは再び発進する。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1980b ヤマト3 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1980</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト3</div>
+        <div class="work-meta">TV / 日本テレビ / 25話</div>
+        <div class="work-desc">
+          1980年10月から放映。ガルマン・ガミラスとボラー連邦の星間大戦に巻き込まれ、太陽の核融合異常増進により再び危機に瀕した地球のため、移民先惑星を求めてヤマトが旅に出る。
+        </div>
+        <div class="awesome">★ 太陽の核融合異常増進というイレギュラーの自然現象。地球人類のため、ヤマトは旅立つ</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2203年</div>
+        <div class="universe-event">
+          原因不明の太陽の核融合異常増進により、残り一年となった地球のため、移民惑星を求め発進するヤマト。しかし、正体不明国家ガルマン、ボラーの戦争に巻き込まれて行ってしまう。
+        </div>
+      </div>
+    </div>
+
+    <!-- 1983 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">1983</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト 完結編</div>
+        <div class="work-meta">劇場 / 東映 / 新作</div>
+        <div class="work-desc">
+          回遊惑星アクエリアスが地球に接近し大洪水の危機。自然現象にあらがうためヤマトが出撃。「これがヤマトの最後だ」として制作・公開された。
+        </div>
+        <div class="awesome">★ 抗えない宇宙規模の災害。現実と通じるものを感じるとして話題になることもあった。</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2205年</div>
+        <div class="universe-event">
+         宇宙戦艦ヤマトのドラマは終わった。さながら務めを果たした虚像の如くヤマトは永遠の彼方へ去っていく。ヤマトの眠りが永遠であるように我々は祈る。さらば偉大な船よ宇宙戦艦ヤマト。さらばわれらが青春の船よ。いま安らかに眠れ。</b>        </div>
+      </div>
+    </div>
+
+    <!-- 2009 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2009</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト 復活篇</div>
+        <div class="work-meta">劇場 / 東映 / 新作</div>
+        <div class="work-desc">
+          「完結編」から26年ぶりの新作劇場版。西崎義展プロデュースで復活。CGを駆使した宇宙戦闘が見どころ。旧作ファンへの贈り物。
+        </div>
+        <div class="awesome">★ 26年ぶりの復活に旧来のファンが涙した</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2220年代</div>
+        <div class="universe-event">
+          移動性ブラックホールの脅威から人類を救うため、アクエリアスの海に沈んだヤマトが今、復活する。
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-classic -->
+
+  <!-- ===== REMAKE PANEL ===== -->
+  <div class="timeline-panel panel-remake" id="panel-remake">
+
+    <div class="col-headers">
+      <div class="col-header year-col">放送年</div>
+      <div class="col-header broadcast-col" style="color:var(--remake)">作品・放送情報</div>
+      <div class="col-header inuniverse-col">劇中年 / 劇中事象</div>
+    </div>
+
+    <!-- 2012 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2012</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト2199</div>
+        <div class="work-meta">劇場先行 / TV / 26話</div>
+        <div class="work-desc">
+          2012年4月から劇場上映、2013年4月からTVアニメとして放映。現代の映像美で第1作を完全リメイク。ガミラスの文化・社会構造まで緻密に描いた傑作。
+        </div>
+        <div class="awesome">★ オリジナル要素を含めた圧倒的な完成度。</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2199年</div>
+        <div class="universe-event">
+          人類滅亡まで1年。絶望に瀕した地球にイスカンダルから波動エンジンの設計図が届く。コスモリバースシステムという地球を救うシステムを受け取りに行くため、最新技術で今、ヤマトが再び地球より旅立つ。
+        </div>
+      </div>
+    </div>
+
+    <!-- 2014 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2014</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト2199 星巡る方舟</div>
+        <div class="work-meta">劇場 / 新作</div>
+        <div class="work-desc">
+          2199のオリジナルエピソードとして制作された劇場版。異星人でも分かり合えることを証明するオリジナルストーリー。
+        </div>
+        <div class="awesome">★ 2199の世界観をさらに深掘りしたファン必見の補完エピソード</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2199年（イスカンダル帰還途上）</div>
+        <div class="universe-event">
+          イスカンダル帰還の道中正体不明の敵から攻撃を受けるヤマト、離脱するため緊急ワープを実行したヤマトは濃霧に包まれた空間にワープアウトしてしまう。探査のため出発した一行は降り立った惑星で、同じく迷い込んだガミラス人、そして密林の中に眠るヤマトを見つける。
+        </div>
+      </div>
+    </div>
+
+    <!-- 2017 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2017</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト2202 愛の戦士たち</div>
+        <div class="work-meta">劇場 / TV / 26話</div>
+        <div class="work-desc">
+          「さらば」のリメイクとして制作。テレサとガトランティス帝国の物語を現代映像美で再構築。「コスモリバースシステム」概念が大幅に拡張。
+        </div>
+        <div class="awesome">★ 愛と犠牲のテーマをより深く掘り下げた。人が人で生きるため選択する。</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2202年</div>
+        <div class="universe-event">
+          ガトランティス帝国の侵攻により再び危機に瀕した地球。ガトランティスとの戦いの中、各人物があらゆる「選択」を強いられる。人が人であるための選択を。
+        </div>
+      </div>
+    </div>
+
+    <!-- 2020 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2020</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">宇宙戦艦ヤマト2205 新たなる旅立ち</div>
+        <div class="work-meta">劇場 / 前後章</div>
+        <div class="work-desc">
+          旧作「新たなる旅立ち」のリメイク。スターシャの運命、イスカンダルの崩壊、サーシャの登場。デスラー・古代の絆を描く感情的に濃厚な作品。
+        </div>
+        <div class="awesome">★ 旧作で書かれなかったガミラス、イスカンダルの関係性が深堀されていく。</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2205年</div>
+        <div class="universe-event">
+          ガトランティス戦役より復興した地球、新たな乗組員を加えたヤマト、ヒュウガ、アスカの第65護衛隊はイスカンダルへの表敬訪問と訓練航海を兼ねて地球を発進する。
+                </div>
+      </div>
+    </div>
+
+    <!-- 2022 -->
+    <div class="tl-entry">
+      <div class="tl-year">
+        <div class="year-number">2022</div>
+        <div class="year-dot"></div>
+      </div>
+      <div class="tl-broadcast">
+        <div class="work-title">ヤマトよ永遠に REBEL3199</div>
+        <div class="work-meta">劇場 / 前後章（継続中）</div>
+        <div class="work-desc">
+          「ヤマトよ永遠に」のリメイク。2022年10月第一章、2024年第二章が公開。暗黒星団帝国の侵攻を現代解釈で描く最新作。
+        </div>
+        <div class="awesome">★ リメイクシリーズの集大成へ向けた新章。現在進行形の歴史がここにある</div>
+      </div>
+      <div class="tl-universe">
+        <div class="universe-year">西暦 2207年（予定）</div>
+        <div class="universe-event">
+          未来の地球を名乗るデザリアム。孤立するヤマト。新たなガルマン・ガミラスの姿。展開される政治戦、プロパガンダ。現実の延長とされるリメイクヤマト、リアリティの高さ故怖さが存在してしまう最新作。
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panel-remake -->
+
+</div><!-- /page -->
+
+<footer>
+  YAMATO ETERNAL ODYSSEY — 宇宙戦艦ヤマト © 西崎義展 / 松本零士 及び各制作会社
+</footer>
+
+<script>
+// ── Starfield ──
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [], W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 180; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.3 + 0.2,
+      speed: Math.random() * 0.25 + 0.04,
+      op: Math.random() * 0.6 + 0.15,
+      tw: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, W, H);
+  const sy = window.scrollY;
+  stars.forEach(s => {
+    s.tw += 0.012;
+    const op = s.op * (0.75 + 0.25 * Math.sin(s.tw));
+    ctx.beginPath();
+    ctx.arc(s.x, (s.y + sy * s.speed) % H, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(192,192,255,${op})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+resize(); initStars(); drawStars();
+window.addEventListener('resize', () => { resize(); initStars(); });
+
+// ── Tab switch ──
+function switchTab(mode) {
+  const btnClassic = document.getElementById('btn-classic');
+  const btnRemake  = document.getElementById('btn-remake');
+  const panelClassic = document.getElementById('panel-classic');
+  const panelRemake  = document.getElementById('panel-remake');
+
+  btnClassic.className = 'tab-btn' + (mode === 'classic' ? ' active-classic' : '');
+  btnRemake.className  = 'tab-btn' + (mode === 'remake'  ? ' active-remake'  : '');
+
+  panelClassic.classList.toggle('active', mode === 'classic');
+  panelRemake.classList.toggle('active',  mode === 'remake');
+
+  // re-trigger scroll reveal for newly shown entries
+  setTimeout(observeEntries, 50);
+}
+
+// ── Scroll reveal ──
+function observeEntries() {
+  const entries = document.querySelectorAll('.timeline-panel.active .tl-entry:not(.visible)');
+  const obs = new IntersectionObserver((recs) => {
+    recs.forEach((r, i) => {
+      if (r.isIntersecting) {
+        setTimeout(() => r.target.classList.add('visible'), i * 80);
+        obs.unobserve(r.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  entries.forEach(e => obs.observe(e));
+}
+
+observeEntries();
+</script>
+</body>
+</html>
